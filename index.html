@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kənanın saytı</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+            background: linear-gradient(135deg, #17152e, #4b1d6b, #111827);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 450px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(255,255,255,0.10);
+            border-radius: 25px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+
+            animation: ortayaGel 1s ease;
+        }
+
+        .profil {
+            width: 120px;
+            height: 120px;
+            margin: auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00e5ff, #9c27ff);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 45px;
+            font-weight: bold;
+
+            box-shadow: 0 0 30px rgba(0,229,255,0.5);
+
+            animation: hereket 3s infinite ease-in-out;
+        }
+
+        h1 {
+            margin-top: 25px;
+            font-size: 32px;
+        }
+
+        p {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 30px;
+
+            background: linear-gradient(90deg, #00e5ff, #9c27ff);
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.08);
+        }
+
+        #mesaj {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        @keyframes ortayaGel {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes hereket {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="profil">
+            K
+        </div>
+
+        <h1>Kənan 👋</h1>
+
+        <p>
+            Salam! Mənim şəxsi saytım.
+            Burada özüm haqqında məlumatlar,
+            layihələrim və maraqlarım olacaq.
+        </p>
+
+        <button onclick="mesajGoster()">
+            Mənə kliklə 🚀
+        </button>
+
+        <div id="mesaj"></div>
+
+    </div>
+
+    <script>
+        function mesajGoster() {
+            document.getElementById("mesaj").innerHTML =
+                "Sayta xoş gəlmisən! 😎🔥";
+        }
+    </script>
+
+</body>
+</html>
