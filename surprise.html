@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ad günün mübarək! 🎂</title>
+<link rel="stylesheet" href="birthday.css">
+</head>
+
+<body>
+
+<div class="balloons">
+<div class="balloon">🎈</div>
+<div class="balloon">🎈</div>
+<div class="balloon">🎈</div>
+<div class="balloon">🎈</div>
+<div class="balloon">🎈</div>
+</div>
+
+<div class="confetti">
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+</div>
+
+<div class="stars">
+<span class="star">✦</span>
+<span class="star">✧</span>
+<span class="star">✦</span>
+<span class="star">✧</span>
+<span class="star">✦</span>
+<span class="star">✧</span>
+</div>
+
+<main class="page">
+
+<div class="box">cd ~/sayt
+nano surprise.html
+
+<div class="gift">🎂</div>
+
+<p>Bu gün sənin xüsusi günündür...</p>
+
+<div class="name">
+Aidə
+</div>
+
+<h1>Ad günün mübarək! 🎉</h1>
+
+<p class="message">
+Sənə yeni yaşında bol-bol xoşbəxtlik,
+sağlamlıq, uğur və gözəl günlər arzulayıram.
+Bütün arzularının gerçəkləşməsi diləyi ilə...
+❤️✨
+</p>
+
+<button class="music" onclick="playMusic()">
+🎵 Mahnını başlat
+</button>
+
+<audio id="music" loop>
+<source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<br>
+
+<a class="btn" href="index.html">
+← Geri qayıt
+</a>
+
+</div>
+
+</main>
+
+<footer>
+Designed & developed by Kənan
+</footer>
+
+<script>
+
+function playMusic(){
+
+const music=document.getElementById("music");
+const button=document.querySelector(".music");
+
+if(music.paused){
+
+music.play();
+
+button.innerHTML="⏸ Mahnını dayandır";
+
+}else{
+
+music.pause();
+
+button.innerHTML="🎵 Mahnını başlat";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

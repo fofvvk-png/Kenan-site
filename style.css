@@ -1,0 +1,305 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    color:white;
+    background:#050816;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+/* Hərəkətli fon */
+
+body::before,
+body::after{
+    content:"";
+    position:fixed;
+    width:350px;
+    height:350px;
+    border-radius:50%;
+    filter:blur(100px);
+    opacity:.35;
+    z-index:-1;
+    animation:float 7s infinite alternate ease-in-out;
+}
+
+body::before{
+    background:#7c3aed;
+    top:-100px;
+    left:-100px;
+}
+
+body::after{
+    background:#06b6d4;
+    bottom:-100px;
+    right:-100px;
+    animation-delay:2s;
+}
+
+@keyframes float{
+    from{
+        transform:translate(0,0);
+    }
+    to{
+        transform:translate(80px,60px);
+    }
+}
+
+/* Naviqasiya */
+
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding:18px 7%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(5,8,22,.65);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.1);
+    z-index:100;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#22d3ee;
+}
+
+nav{
+    display:flex;
+    gap:22px;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    transition:.3s;
+}
+
+nav a:hover{
+    color:#22d3ee;
+}
+
+/* Səhifə */
+
+.page{
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+    padding:140px 0 80px;
+    animation:pageIn .8s ease;
+}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* Ana səhifə */
+
+.hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:100px 20px;
+}
+
+.avatar{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:55px;
+    font-weight:bold;
+    background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+    box-shadow:0 0 50px #7c3aed;
+    animation:avatar 3s infinite ease-in-out;
+}
+
+@keyframes avatar{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-15px);
+    }
+}
+
+h1{
+    font-size:clamp(42px,9vw,75px);
+    margin:25px 0 15px;
+}
+
+.gradient{
+    background:linear-gradient(90deg,#a78bfa,#22d3ee,#a78bfa);
+    background-size:200%;
+    -webkit-background-clip:text;
+    color:transparent;
+    animation:gradient 4s linear infinite;
+}
+
+@keyframes gradient{
+    to{
+        background-position:200%;
+    }
+}
+
+.description{
+    max-width:650px;
+    line-height:1.7;
+    font-size:18px;
+    opacity:.8;
+}
+
+.buttons{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:30px;
+}
+
+.btn{
+    display:inline-block;
+    padding:14px 23px;
+    border-radius:30px;
+    text-decoration:none;
+    color:white;
+    background:linear-gradient(135deg,#7c3aed,#0891b2);
+    transition:.3s;
+}
+
+.btn:hover{
+    transform:translateY(-5px) scale(1.03);
+    box-shadow:0 12px 35px rgba(34,211,238,.25);
+}
+
+.btn.secondary{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.15);
+}
+
+/* Başlıqlar */
+
+.title{
+    text-align:center;
+    font-size:42px;
+    margin-bottom:40px;
+}
+
+/* Kartlar */
+
+.card{
+    padding:30px;
+    margin-bottom:20px;
+    border-radius:25px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.1);
+    backdrop-filter:blur(15px);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+    border-color:rgba(34,211,238,.4);
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+.card h2{
+    margin-bottom:12px;
+}
+
+.card p{
+    line-height:1.8;
+    opacity:.8;
+}
+
+/* Bacarıqlar */
+
+.skill{
+    margin:25px 0;
+}
+
+.skill-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+
+.bar{
+    height:10px;
+    border-radius:20px;
+    background:#ffffff15;
+    overflow:hidden;
+}
+
+.fill{
+    height:100%;
+    border-radius:20px;
+    background:linear-gradient(90deg,#8b5cf6,#06b6d4);
+    animation:bar 1.5s ease;
+}
+
+@keyframes bar{
+    from{
+        width:0;
+    }
+}
+
+/* Layihələr */
+
+.projects{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+/* Footer */
+
+footer{
+    text-align:center;
+    padding:40px;
+    opacity:.6;
+}
+
+/* Mobil */
+
+@media(max-width:650px){
+
+    nav{
+        display:none;
+    }
+
+    .title{
+        font-size:34px;
+    }
+
+    .description{
+        font-size:16px;
+    }
+}
