@@ -57,12 +57,18 @@ Bütün arzularının gerçəkləşməsi diləyi ilə...
 ❤️✨
 </p>
 
-<button class="music" onclick="playMusic()">
-🎵 Mahnını başlat
-</button>
+<button onclick="playMusic()">🎵 Mahnını oxut</button>
+
+<audio id="music" src="music.mp3"></audio>
+
+<script>
+function playMusic() {
+    document.getElementById("music").play();
+}
+</script>
 
 <audio id="music" loop>
-<source src="music.mp3" type="audio/mpeg">
+<audio id="music" src="music.mp3"></audio> type="audio/mpeg">
 </audio>
 
 <br>
