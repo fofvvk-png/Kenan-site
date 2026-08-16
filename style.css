@@ -1,93 +1,187 @@
 * {
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background-color: #121212;
-  color: #ffffff;
+  background-color: #0b0f19;
+  color: #f1f5f9;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  margin: 0;
   padding: 15px;
 }
 
-.card {
-  background-color: #1e1e1e;
-  padding: 25px;
-  border-radius: 16px;
+.container {
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  border: 1px solid #333;
+  max-width: 460px;
+  background-color: #151c2c;
+  border-radius: 24px;
+  padding: 25px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid #1e293b;
 }
 
-h2 {
-  margin-top: 0;
-  color: #4da6ff;
+header {
   text-align: center;
+  margin-bottom: 25px;
 }
 
-.subtitle {
-  text-align: center;
-  color: #aaa;
-  font-size: 0.9em;
-  margin-bottom: 20px;
+header h1 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  letter-spacing: 0.5px;
+}
+
+header p {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* Səhifə idarəetməsi */
+.page {
+  display: none;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page.active {
+  display: block;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ana Menyu Kartları */
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-card {
+  background: #1e293b;
+  padding: 22px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid #334155;
+}
+
+.menu-card:hover {
+  background: #273549;
+  border-color: #38bdf8;
+  transform: translateY(-3px);
+}
+
+.menu-card .icon {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.menu-card h3 {
+  color: #38bdf8;
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.menu-card p {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Düymələr və İnputlar */
+.back-btn {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 18px;
+  padding: 0;
 }
 
 .input-group {
-  margin-bottom: 15px;
+  margin-bottom: 14px;
 }
 
 label {
   display: block;
-  font-size: 0.85em;
-  margin-bottom: 5px;
-  color: #ddd;
+  font-size: 0.82rem;
+  margin-bottom: 6px;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 input {
   width: 100%;
-  padding: 10px 12px;
-  background-color: #2a2a2a;
-  border: 1px solid #444;
-  border-radius: 8px;
+  padding: 12px 14px;
+  background-color: #0b0f19;
+  border: 1px solid #334155;
+  border-radius: 12px;
   color: #fff;
   outline: none;
+  font-size: 0.95rem;
+  transition: 0.2s;
 }
 
 input:focus {
-  border-color: #4da6ff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
 }
 
 button {
   width: 100%;
-  padding: 12px;
-  background-color: #4da6ff;
-  color: white;
+  padding: 14px;
+  background-color: #38bdf8;
+  color: #0b0f19;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 8px;
+  transition: 0.2s;
 }
 
 button:hover {
-  background-color: #3b88d4;
+  background-color: #0284c7;
+  color: #fff;
 }
 
-.result-box {
-  margin-top: 20px;
-  padding: 15px;
-  background: #252d3a;
-  border-radius: 10px;
-  border-left: 4px solid #4da6ff;
+.model-container {
+  width: 100%;
+  height: 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  background-color: #000;
+}
+
+.model-container iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.report-box {
+  background: #0b0f19;
+  padding: 18px;
+  border-radius: 14px;
+  border-left: 4px solid #38bdf8;
+  line-height: 1.6;
 }
 
 .tg-btn {
   background-color: #0088cc;
+  color: white;
+  margin-top: 15px;
 }
 
 .tg-btn:hover {
