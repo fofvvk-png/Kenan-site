@@ -41,8 +41,8 @@ function calculate() {
 }
 
 function sendToTelegram() {
-  const botToken = 'BOT_TOKEN_BURAYA_YAZ';
-  const chatId = 'CHAT_ID_BURAYA_YAZ';
+  const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A';
+  const chatId = '1937526981';
 
   if (!globalReportText) return;
 
