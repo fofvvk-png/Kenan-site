@@ -1,6 +1,6 @@
 let globalReportText = "";
 
-// Modellərin bazası (Axtarış üçün verilənlər)
+// Modellərin bazası
 const car3DBase = {
   "cruze": "https://sketchfab.com/models/0d368e7d23f742c388efd48e00ee56d0/embed?autostart=1&ui_controls=1",
   "optima": "https://sketchfab.com/models/4e95d733845b4a539b4f0b2f5b615c82/embed?autostart=1&ui_controls=1",
@@ -34,9 +34,8 @@ function searchAndGenerate3D() {
 
   carTitle.innerText = `${modelInput} ${yearInput ? '(' + yearInput + ')' : ''}`;
 
-  // Daxil edilən sözün içindən maşın brendini tapır
   const searchKey = modelInput.toLowerCase();
-  let foundUrl = car3DBase["cruze"]; // Standart olaraq göstərmək üçün
+  let foundUrl = car3DBase["cruze"];
 
   if (searchKey.includes("optima")) foundUrl = car3DBase["optima"];
   else if (searchKey.includes("fusion")) foundUrl = car3DBase["fusion"];
@@ -104,4 +103,4 @@ function sendToTelegram() {
       alert("❌ Xəta baş verdi.");
     }
   });
-      }
+}
