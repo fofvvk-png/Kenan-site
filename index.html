@@ -3,51 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoAssistant - Kalkulyator</title>
+  <title>AutoAssistant - İnteraktiv Avto Platforma</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="card">
-    <h2>🚗 AutoAssistant</h2>
-    <p class="subtitle">Yanacaq və Texniki Qulluq Hesablayıcısı</p>
 
-    <form id="autoForm">
-      <div class="input-group">
-        <label>🚘 Avtomobil Modeli:</label>
-        <input type="text" id="model" placeholder="məs: Chevrolet Cruze, Kia Optima" required>
+  <div class="container">
+    <!-- Başlıq -->
+    <header>
+      <h1>🚗 AutoAssistant</h1>
+      <p>Şəxsi Avtomobil və Texniki Qulluq Paneli</p>
+    </header>
+
+    <!-- ANA MENYU -->
+    <div id="homePage" class="page active">
+      <div class="menu-grid">
+        
+        <div class="menu-card" onclick="showPage('garagePage')">
+          <div class="icon">🚘</div>
+          <h3>3D Avtomobil Qarajı</h3>
+          <p>İstədiyiniz markanı, modeli və ili daxil edərək maşını 3D görünüşdə yaradın və inceleyin.</p>
+        </div>
+
+        <div class="menu-card" onclick="showPage('calcPage')">
+          <div class="icon">⛽</div>
+          <h3>Yanacaq & Texniki Qulluq</h3>
+          <p>100 km sərfiyyatı, xərcləri və növbəti yağ dəyişmə vaxtını hesablayıb Telegram-a göndərin.</p>
+        </div>
+
       </div>
-
-      <div class="input-group">
-        <label>🛣️ Qət edilən məsafə (km):</label>
-        <input type="number" id="distance" placeholder="məs: 450" required>
-      </div>
-
-      <div class="input-group">
-        <label>⛽ İşlədilən yanacaq (Litr):</label>
-        <input type="number" step="0.1" id="fuel" placeholder="məs: 40" required>
-      </div>
-
-      <div class="input-group">
-        <label>💰 Yanacağın litr qiyməti (AZN):</label>
-        <input type="number" step="0.01" id="price" value="1.10" required>
-      </div>
-
-      <div class="input-group">
-        <label>🔧 Cari Yürüş (Probeq - km):</label>
-        <input type="number" id="mileage" placeholder="məs: 185000" required>
-      </div>
-
-      <button type="button" onclick="calculate()">📊 Hesabla və Şəxsi Hesabat Yarat</button>
-    </form>
-
-    <div id="result" class="result-box" style="display: none;">
-      <h3>📋 Hesabat Nəticələri:</h3>
-      <p id="resFuel"></p>
-      <p id="resCost"></p>
-      <p id="resOil"></p>
-
-      <button class="tg-btn" onclick="sendToTelegram()">📩 Hesabatı Telegram-a Göndər</button>
     </div>
+
+    <!-- 1-Cİ BÖLMƏ: 3D QARAJ (Axtarış/Yaratma) -->
+    <div id="garagePage" class="page">
+      <button class="back-btn" onclick="showPage('homePage')">⬅️ Ana Menyuyə Qayıt</button>
+      <h2>🚘 3D Avtomobil Qarajı</h2>
+      
+      <div class="form-group">
+        <div class="input-group">
+          <label>Marka / Model:</label>
+          <input type="text" id="customModel" placeholder="məs: Chevrolet Cruze, Kia Optima">
+        </div>
+
+        <div class="input-group">
+          <label>İl:</label>
+          <input type="number" id="customYear" placeholder="məs: 2014">
+        </div>
+
+        <button type="button" onclick="searchAndGenerate3D()">🔍 Qarajda Maşını Yarat</button>
+      </div>
+
+      <!-- 3D Ekranı -->
+      <div id="garageDisplay" style="display: none; margin-top: 20px;">
+        <h3 id="carTitle" style="color: #38bdf8; text-align: center; margin-bottom: 10px;"></h3>
+        <div class="model-container">
+          <iframe id="carIframe" src="" frameborder="0" allow="autoplay; fullscreen; vr"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-Cİ BÖLMƏ: YANACAQ VƏ TEXNİKİ HESABLAYICI -->
+    <div id="calcPage" class="page">
+      <button class="back-btn" onclick="showPage('homePage')">⬅️ Ana Menyuyə Qayıt</button>
+      <h2>⛽ Yanacaq & Qulluq Hesablayıcısı</h2>
+
+      <form id="autoForm">
+        <div class="input-group">
+          <label>🚘 Avtomobil Modeli:</label>
+          <input type="text" id="calcModelName" placeholder="məs: Chevrolet Cruze">
+        </div>
+
+        <div class="input-group">
+          <label>🛣️ Qət edilən məsafə (km):</label>
+          <input type="number" id="distance" placeholder="məs: 450">
+        </div>
+
+        <div class="input-group">
+          <label>⛽ İşlədilən yanacaq (Litr):</label>
+          <input type="number" step="0.1" id="fuel" placeholder="məs: 40">
+        </div>
+
+        <div class="input-group">
+          <label>💰 Yanacağın litr qiyməti (AZN):</label>
+          <input type="number" step="0.01" id="price" value="1.10">
+        </div>
+
+        <div class="input-group">
+          <label>🔧 Cari Yürüş (Probeq - km):</label>
+          <input type="number" id="mileage" placeholder="məs: 185000">
+        </div>
+
+        <button type="button" onclick="calculateFuel()">📊 Hesabla və Şəxsi Hesabat Yarat</button>
+      </form>
+
+      <!-- Hesabat Nəticəsi -->
+      <div id="calcResult" class="report-box" style="display: none; margin-top: 20px;">
+        <h3>📋 Hesabat Nəticələri:</h3>
+        <p id="resFuel"></p>
+        <p id="resCost"></p>
+        <p id="resOil"></p>
+
+        <button class="tg-btn" onclick="sendToTelegram()">📩 Hesabatı Telegram-a Göndər</button>
+      </div>
+    </div>
+
   </div>
 
   <script src="script.js"></script>
