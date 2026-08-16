@@ -1,78 +1,55 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Sənin üçün 🎁</title>
-<link rel="stylesheet" href="birthday.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoAssistant - Kalkulyator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<script data-goatcounter="https://fofvvk-png.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-  
 <body>
+  <div class="card">
+    <h2>🚗 AutoAssistant</h2>
+    <p class="subtitle">Yanacaq və Texniki Qulluq Hesablayıcısı</p>
 
-<div class="stars">
-<span class="star">✦</span>
-<span class="star">✧</span>
-<span class="star">✦</span>
-<span class="star">✧</span>
-<span class="star">✦</span>
-<span class="star">✧</span>
-</div>
+    <form id="autoForm">
+      <div class="input-group">
+        <label>🚘 Avtomobil Modeli:</label>
+        <input type="text" id="model" placeholder="məs: Chevrolet Cruze, Kia Optima" required>
+      </div>
 
-<main class="page">
+      <div class="input-group">
+        <label>🛣️ Qət edilən məsafə (km):</label>
+        <input type="number" id="distance" placeholder="məs: 450" required>
+      </div>
 
-<div class="box">
+      <div class="input-group">
+        <label>⛽ İşlədilən yanacaq (Litr):</label>
+        <input type="number" step="0.1" id="fuel" placeholder="məs: 40" required>
+      </div>
 
-<div class="gift">🎁</div>
+      <div class="input-group">
+        <label>💰 Yanacağın litr qiyməti (AZN):</label>
+        <input type="number" step="0.01" id="price" value="1.10" required>
+      </div>
 
-<h1>Sənin üçün bir sürprizim var</h1>
+      <div class="input-group">
+        <label>🔧 Cari Yürüş (Probeq - km):</label>
+        <input type="number" id="mileage" placeholder="məs: 185000" required>
+      </div>
 
-<p>
-Bu səhifəni sənin üçün xüsusi hazırladım.
-Hazırsansa, sürprizi aça bilərsən... ✨
-</p>
+      <button type="button" onclick="calculate()">📊 Hesabla və Şəxsi Hesabat Yarat</button>
+    </form>
 
-<a class="btn" href="surprise.html">
-Sürprizi aç ✨
-</a>
+    <div id="result" class="result-box" style="display: none;">
+      <h3>📋 Hesabat Nəticələri:</h3>
+      <p id="resFuel"></p>
+      <p id="resCost"></p>
+      <p id="resOil"></p>
 
-</div>
+      <button class="tg-btn" onclick="sendToTelegram()">📩 Hesabatı Telegram-a Göndər</button>
+    </div>
+  </div>
 
-</main>
-<script>
-  async function sendVisitorInfo() {
-    const ipRes = await fetch('https://api.ipify.org?format=json');
-    const ipData = await ipRes.json();
-    
-    let deviceModel = "Məlum deyil";
-    
-    // Dəqiq cihaz modelini almaq üçün
-    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-      try {
-        const ua = await navigator.userAgentData.getHighEntropyValues(["model", "platformVersion"]);
-        if (ua.model) deviceModel = ua.model;
-      } catch (e) {}
-    }
-
-    const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A';
-    const chatId = '1937526981';
-
-    const text = `🚨 *Yeni Ziyarətçi!*\n\n🌐 *IP:* ${ipData.ip}\n📱 *Model:* ${deviceModel}\n🔍 *UA:* ${navigator.userAgent}`;
-
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown'
-      })
-    });
-  }
-
-  sendVisitorInfo();
-</script>
-
-  
+  <script src="script.js"></script>
 </body>
 </html>
