@@ -1,35 +1,77 @@
 let globalReportText = "";
 
-function calculate() {
-  const model = document.getElementById('model').value;
+// Modellərin bazası (Axtarış üçün verilənlər)
+const car3DBase = {
+  "cruze": "https://sketchfab.com/models/0d368e7d23f742c388efd48e00ee56d0/embed?autostart=1&ui_controls=1",
+  "optima": "https://sketchfab.com/models/4e95d733845b4a539b4f0b2f5b615c82/embed?autostart=1&ui_controls=1",
+  "fusion": "https://sketchfab.com/models/5cb40edbcbc142bb8d88b4be72a6b25f/embed?autostart=1&ui_controls=1",
+  "w210": "https://sketchfab.com/models/bf3eb2ef82b6470aa103bd813dddbb02/embed?autostart=1&ui_controls=1",
+  "elantra": "https://sketchfab.com/models/ef24c96a32cb4d51b3a39e3fdf71ad52/embed?autostart=1&ui_controls=1",
+  "note": "https://sketchfab.com/models/2f1b4a1b0ad342e4822ff2f6f5902be3/embed?autostart=1&ui_controls=1"
+};
+
+// Səhifələri dəyişən funksiya
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
+  document.getElementById(pageId).classList.add('active');
+}
+
+// 1. QARAJDADA MAŞIN YARATMA HİSSƏSİ
+function searchAndGenerate3D() {
+  const modelInput = document.getElementById('customModel').value.trim();
+  const yearInput = document.getElementById('customYear').value.trim();
+
+  if (!modelInput) {
+    alert("Zəhmət olmasa maşının modelini yazın!");
+    return;
+  }
+
+  const carTitle = document.getElementById('carTitle');
+  const iframe = document.getElementById('carIframe');
+  const garageDisplay = document.getElementById('garageDisplay');
+
+  carTitle.innerText = `${modelInput} ${yearInput ? '(' + yearInput + ')' : ''}`;
+
+  // Daxil edilən sözün içindən maşın brendini tapır
+  const searchKey = modelInput.toLowerCase();
+  let foundUrl = car3DBase["cruze"]; // Standart olaraq göstərmək üçün
+
+  if (searchKey.includes("optima")) foundUrl = car3DBase["optima"];
+  else if (searchKey.includes("fusion")) foundUrl = car3DBase["fusion"];
+  else if (searchKey.includes("w210") || searchKey.includes("mercedes")) foundUrl = car3DBase["w210"];
+  else if (searchKey.includes("elantra")) foundUrl = car3DBase["elantra"];
+  else if (searchKey.includes("note")) foundUrl = car3DBase["note"];
+
+  iframe.src = foundUrl;
+  garageDisplay.style.display = 'block';
+}
+
+// 2. YANACAQ VƏ TEXNİKİ HESABLAYICI HİSSƏSİ
+function calculateFuel() {
+  const model = document.getElementById('calcModelName').value || "Avtomobil";
   const distance = parseFloat(document.getElementById('distance').value);
   const fuel = parseFloat(document.getElementById('fuel').value);
   const price = parseFloat(document.getElementById('price').value);
   const mileage = parseInt(document.getElementById('mileage').value);
 
-  if (!model || !distance || !fuel || !price || !mileage) {
+  if (!distance || !fuel || !price || !mileage) {
     alert("Zəhmət olmasa bütün xanaları doldurun!");
     return;
   }
 
-  // 100 km-ə sərfiyyat
   const avgFuel = ((fuel / distance) * 100).toFixed(1);
-  
-  // Ümumi xərc və 1 km xərci
   const totalCost = (fuel * price).toFixed(2);
   const costPerKm = (totalCost / distance).toFixed(2);
-
-  // Yağ dəyişmə vaxtı (+8000 km standart norma)
   const nextOilChange = mileage + 8000;
 
-  // Nəticələri ekranda göstəririk
   document.getElementById('resFuel').innerHTML = `⛽ <b>Orta sərfiyyat:</b> ${avgFuel} L / 100 km`;
   document.getElementById('resCost').innerHTML = `💰 <b>Ümumi xərc:</b> ${totalCost} AZN (1 km = ${costPerKm} AZN)`;
   document.getElementById('resOil').innerHTML = `🔧 <b>Növbəti yağ dəyişmə:</b> ${nextOilChange} km-də`;
 
-  document.getElementById('result').style.display = 'block';
+  document.getElementById('calcResult').style.display = 'block';
 
-  // Telegram üçün mətni hazırlayırıq
   globalReportText = `🚘 *Avtomobil Hesabatı*\n` +
                      `───────────────\n` +
                      `🏎️ *Model:* ${model}\n` +
@@ -59,7 +101,7 @@ function sendToTelegram() {
     if(res.ok) {
       alert("✅ Hesabat Telegram botunuza göndərildi!");
     } else {
-      alert("❌ Xəta baş verdi, məlumatları yoxlayın.");
+      alert("❌ Xəta baş verdi.");
     }
   });
-}
+      }
