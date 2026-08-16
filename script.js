@@ -1,14 +1,16 @@
 let globalReportText = "";
 
 // Modellərin bazası
+// Tam işlək və açıq 3D Modellər Bazası
 const car3DBase = {
-  "cruze": "https://sketchfab.com/models/0d368e7d23f742c388efd48e00ee56d0/embed?autostart=1&ui_controls=1",
-  "optima": "https://sketchfab.com/models/4e95d733845b4a539b4f0b2f5b615c82/embed?autostart=1&ui_controls=1",
-  "fusion": "https://sketchfab.com/models/5cb40edbcbc142bb8d88b4be72a6b25f/embed?autostart=1&ui_controls=1",
-  "w210": "https://sketchfab.com/models/bf3eb2ef82b6470aa103bd813dddbb02/embed?autostart=1&ui_controls=1",
-  "elantra": "https://sketchfab.com/models/ef24c96a32cb4d51b3a39e3fdf71ad52/embed?autostart=1&ui_controls=1",
-  "note": "https://sketchfab.com/models/2f1b4a1b0ad342e4822ff2f6f5902be3/embed?autostart=1&ui_controls=1"
+  "cruze": "https://sketchfab.com/models/041efbc3b8e44b93b827e87a229a4a75/embed?autostart=1&ui_controls=1",
+  "optima": "https://sketchfab.com/models/300eb058b8d447d287fa678d1ad64547/embed?autostart=1&ui_controls=1",
+  "fusion": "https://sketchfab.com/models/193237a34fa04a8894ec05b1b70129bc/embed?autostart=1&ui_controls=1",
+  "w210": "https://sketchfab.com/models/782d49f05fef438da15dc2463e8006e8/embed?autostart=1&ui_controls=1",
+  "elantra": "https://sketchfab.com/models/9c488b030bbf4c1aaee79899f8d9b2e7/embed?autostart=1&ui_controls=1",
+  "note": "https://sketchfab.com/models/02f08eb0fb5642cebeebcfbf1c360563/embed?autostart=1&ui_controls=1"
 };
+
 
 // Səhifələri dəyişən funksiya
 function showPage(pageId) {
