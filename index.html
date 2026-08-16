@@ -3,110 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoAssistant - İnteraktiv Avto Platforma</title>
+  <title>AutoAssistant - Şəxsi Avtomobil Paneli</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
   <div class="container">
-    <!-- Başlıq -->
-    <header>
-      <h1>🚗 AutoAssistant</h1>
-      <p>Şəxsi Avtomobil və Texniki Qulluq Paneli</p>
-    </header>
-
-    <!-- ANA MENYU -->
+    <!-- ANA SƏHİFƏ -->
     <div id="homePage" class="page active">
+      <div class="header">
+        <h1>🚗 AutoAssistant</h1>
+        <p>Şəxsi Avtomobil və Texniki Qulluq Paneli</p>
+      </div>
+
       <div class="menu-grid">
-        
-        <div class="menu-card" onclick="showPage('garagePage')">
-          <div class="icon">🚘</div>
-          <h3>3D Avtomobil Qarajı</h3>
+        <div class="card" onclick="showPage('garagePage')">
+          <div class="card-icon">🚘</div>
+          <h2>3D Avtomobil Qarajı</h2>
           <p>İstədiyiniz markanı, modeli və ili daxil edərək maşını 3D görünüşdə yaradın və inceleyin.</p>
         </div>
 
-        <div class="menu-card" onclick="showPage('calcPage')">
-          <div class="icon">⛽</div>
-          <h3>Yanacaq & Texniki Qulluq</h3>
+        <div class="card" onclick="showPage('fuelPage')">
+          <div class="card-icon">⛽</div>
+          <h2>Yanacaq & Texniki Qulluq</h2>
           <p>100 km sərfiyyatı, xərcləri və növbəti yağ dəyişmə vaxtını hesablayıb Telegram-a göndərin.</p>
         </div>
-
       </div>
     </div>
 
-    <!-- 1-Cİ BÖLMƏ: 3D QARAJ (Axtarış/Yaratma) -->
+    <!-- 1. QARAJ SƏHİFƏSİ -->
     <div id="garagePage" class="page">
-      <button class="back-btn" onclick="showPage('homePage')">⬅️ Ana Menyuyə Qayıt</button>
-      <h2>🚘 3D Avtomobil Qarajı</h2>
+      <button class="back-btn" onclick="showPage('homePage')">⬅ Geri Qayıt</button>
       
+      <h2>🚘 3D Avtomobil Qarajı</h2>
+      <p class="sub-text">Yaratmaq istədiyiniz avtomobilin məlumatlarını daxil edin:</p>
+
       <div class="form-group">
-        <div class="input-group">
-          <label>Marka / Model:</label>
-          <input type="text" id="customModel" placeholder="məs: Chevrolet Cruze, Kia Optima">
-        </div>
-
-        <div class="input-group">
-          <label>İl:</label>
-          <input type="number" id="customYear" placeholder="məs: 2014">
-        </div>
-
-        <button type="button" onclick="searchAndGenerate3D()">🔍 Qarajda Maşını Yarat</button>
+        <label>Avtomobil Marka/Modeli:</label>
+        <input type="text" id="customModel" placeholder="Məsələn: Chevrolet Cruze, Kia Optima...">
       </div>
 
-      <!-- 3D Ekranı -->
-      <div id="garageDisplay" style="display: none; margin-top: 20px;">
-        <h3 id="carTitle" style="color: #38bdf8; text-align: center; margin-bottom: 10px;"></h3>
-        <div class="model-container">
-          <iframe id="carIframe" src="" frameborder="0" allow="autoplay; fullscreen; vr"></iframe>
-        </div>
+      <div class="form-group">
+        <label>Buraxılış İli:</label>
+        <input type="number" id="customYear" placeholder="Məsələn: 2015">
+      </div>
+
+      <button class="btn-primary" onclick="searchAndGenerate3D()">✨ 3D Avtomobili Yarat</button>
+
+      <div id="garageDisplay" class="garage-display" style="display: none;">
+        <h3 id="carTitle">Avtomobil</h3>
+        <div id="threeContainer" class="iframe-container"></div>
       </div>
     </div>
 
-    <!-- 2-Cİ BÖLMƏ: YANACAQ VƏ TEXNİKİ HESABLAYICI -->
-    <div id="calcPage" class="page">
-      <button class="back-btn" onclick="showPage('homePage')">⬅️ Ana Menyuyə Qayıt</button>
-      <h2>⛽ Yanacaq & Qulluq Hesablayıcısı</h2>
+    <!-- 2. YANACAQ VƏ TEXNİKİ HESABLAYICI SƏHİFƏSİ -->
+    <div id="fuelPage" class="page">
+      <button class="back-btn" onclick="showPage('homePage')">⬅ Geri Qayıt</button>
 
-      <form id="autoForm">
-        <div class="input-group">
-          <label>🚘 Avtomobil Modeli:</label>
-          <input type="text" id="calcModelName" placeholder="məs: Chevrolet Cruze">
-        </div>
+      <h2>⛽ Yanacaq və Qulluq Hesablayıcı</h2>
+      <p class="sub-text">Sərfiyyatı və xərcləri hesablayın:</p>
 
-        <div class="input-group">
-          <label>🛣️ Qət edilən məsafə (km):</label>
-          <input type="number" id="distance" placeholder="məs: 450">
-        </div>
+      <div class="form-group">
+        <label>Avtomobilin Adı:</label>
+        <input type="text" id="calcModelName" placeholder="Məsələn: Chevrolet Cruze">
+      </div>
 
-        <div class="input-group">
-          <label>⛽ İşlədilən yanacaq (Litr):</label>
-          <input type="number" step="0.1" id="fuel" placeholder="məs: 40">
-        </div>
+      <div class="form-group">
+        <label>Qət olunan məsafə (km):</label>
+        <input type="number" id="distance" placeholder="Məsələn: 450">
+      </div>
 
-        <div class="input-group">
-          <label>💰 Yanacağın litr qiyməti (AZN):</label>
-          <input type="number" step="0.01" id="price" value="1.10">
-        </div>
+      <div class="form-group">
+        <label>Xərclənən yanacaq (Litr):</label>
+        <input type="number" id="fuel" placeholder="Məsələn: 38">
+      </div>
 
-        <div class="input-group">
-          <label>🔧 Cari Yürüş (Probeq - km):</label>
-          <input type="number" id="mileage" placeholder="məs: 185000">
-        </div>
+      <div class="form-group">
+        <label>1 Litr Yanacağın Qiyməti (AZN):</label>
+        <input type="number" step="0.01" id="price" placeholder="Məsələn: 1.00">
+      </div>
 
-        <button type="button" onclick="calculateFuel()">📊 Hesabla və Şəxsi Hesabat Yarat</button>
-      </form>
+      <div class="form-group">
+        <label>Cari Probeq (km):</label>
+        <input type="number" id="mileage" placeholder="Məsələn: 185000">
+      </div>
 
-      <!-- Hesabat Nəticəsi -->
-      <div id="calcResult" class="report-box" style="display: none; margin-top: 20px;">
-        <h3>📋 Hesabat Nəticələri:</h3>
+      <button class="btn-primary" onclick="calculateFuel()">🧮 Hesabla</button>
+
+      <div id="calcResult" class="result-box" style="display: none;">
+        <h3>📊 Hesabat Nəticəsi</h3>
         <p id="resFuel"></p>
         <p id="resCost"></p>
         <p id="resOil"></p>
-
-        <button class="tg-btn" onclick="sendToTelegram()">📩 Hesabatı Telegram-a Göndər</button>
+        <button class="btn-telegram" onclick="sendToTelegram()">📲 Hesabatı Telegram-a Göndər</button>
       </div>
     </div>
-
   </div>
 
   <script src="script.js"></script>
