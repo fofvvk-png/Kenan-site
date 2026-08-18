@@ -16,6 +16,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      overflow: hidden;
     }
 
     h1 {
@@ -35,6 +36,66 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
+    /* Ad Daxil Etmə Pəncərəsi (Modal) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-box {
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #38bdf8;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      max-width: 300px;
+      width: 80%;
+    }
+
+    .modal-box h2 {
+      margin-top: 0;
+      color: #38bdf8;
+    }
+
+    .modal-box input {
+      width: 90%;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 6px;
+      border: 1px solid #38bdf8;
+      background: #0f172a;
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
+      outline: none;
+    }
+
+    .btn-start {
+      padding: 10px 25px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #38bdf8;
+      color: #0f172a;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn-start:hover {
+      background-color: #0284c7;
+      color: #fff;
+    }
+
     .btn-restart {
       margin-top: 15px;
       padding: 10px 20px;
@@ -47,28 +108,39 @@
       cursor: pointer;
       display: none;
     }
-
-    .btn-restart:hover {
-      background-color: #0284c7;
-      color: #fff;
-    }
   </style>
 </head>
 <body>
 
+  <!-- Ad Tələb Olunan Giriş Pəncərəsi -->
+  <div id="startModal" class="modal-overlay">
+    <div class="modal-box">
+      <h2>🏎️ Sürücü Adı</h2>
+      <p>Oyuna başlamaq üçün adınızı daxil edin:</p>
+      <input type="text" id="playerNameInput" placeholder="Adınızı yazın..." maxlength="20">
+      <button class="btn-start" onclick="startGameWithPlayer()">Oyuna Başla 🚀</button>
+    </div>
+  </div>
+
   <h1>🏎️ 2D Avtomobil Yarışı</h1>
-  <div class="info">Xal: <span id="score">0</span></div>
+  <div class="info">Sürücü: <b id="driverName" style="color: #38bdf8;">-</b> | Xal: <span id="score">0</span></div>
 
   <canvas id="gameCanvas" width="360" height="500"></canvas>
   <button id="restartBtn" class="btn-restart" onclick="restartGame()">Yenidən Başla 🔄</button>
 
   <script>
+    const botToken = 'BOT_TOKEN_BURAYA_YAZ';
+    const chatId = 'CHAT_ID_BURAYA_YAZ';
+
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const scoreElement = document.getElementById("score");
     const restartBtn = document.getElementById("restartBtn");
 
-    // --- SƏS SİSTEMİ (Web Audio API) ---
+    let playerName = "";
+    let gameStarted = false;
+
+    // --- SƏS SİSTEMİ ---
     let audioCtx = null;
     let engineOsc = null;
     let engineGain = null;
@@ -76,14 +148,12 @@
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Mühərrik genratoru
         engineOsc = audioCtx.createOscillator();
         engineGain = audioCtx.createGain();
 
-        engineOsc.type = 'sawtooth'; // Motor xırıldaması üçün
-        engineOsc.frequency.setValueAtTime(60, audioCtx.currentTime); // Başlanğıc RPM
-        engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime); // Səs səviyyəsi
+        engineOsc.type = 'sawtooth';
+        engineOsc.frequency.setValueAtTime(60, audioCtx.currentTime);
+        engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
 
         engineOsc.connect(engineGain);
         engineGain.connect(audioCtx.destination);
@@ -96,8 +166,6 @@
 
     function playCrashSound() {
       if (!audioCtx) return;
-      
-      // Toqquşma səsi üçün ağ küy (white noise)
       const bufferSize = audioCtx.sampleRate * 0.5;
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
@@ -125,10 +193,44 @@
 
     function updateEnginePitch(speed) {
       if (engineOsc && audioCtx) {
-        // Maşın sürətləndikcə motorun səsi (tonu) yüksəlir
         const freq = 50 + (speed * 12);
         engineOsc.frequency.setValueAtTime(freq, audioCtx.currentTime);
       }
+    }
+
+    // --- OYUNA BAŞLAMA VƏ TELEGRAMA GÖNDƏRMƏ ---
+    async function startGameWithPlayer() {
+      const input = document.getElementById("playerNameInput");
+      const name = input.value.trim();
+
+      if (!name) {
+        alert("Zəhmət olmasa adınızı yazın!");
+        return;
+      }
+
+      playerName = name;
+      document.getElementById("driverName").innerText = playerName;
+      document.getElementById("startModal").style.display = "none";
+
+      initAudio();
+      gameStarted = true;
+
+      // Telegram-a Sürücü Məlumatını Göndər
+      try {
+        const message = `👤 *YENİ SÜRÜCÜ OYUNA BAŞLADI!*\n\n` +
+                        `📛 *Sürücü Adı:* \`${playerName}\`\n` +
+                        `📅 *Tarix:* ${new Date().toLocaleString('az-AZ')}`;
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
+        });
+      } catch (e) {
+        console.error("Telegram göndərişində xəta:", e);
+      }
+
+      gameLoop();
     }
 
     // Oyun dəyişənləri
@@ -150,7 +252,7 @@
 
     // İdarəetmə
     document.addEventListener("keydown", (e) => {
-      initAudio();
+      if (!gameStarted) return;
       if (e.key === "ArrowLeft" || e.key === "a") player.dx = -player.speed;
       if (e.key === "ArrowRight" || e.key === "d") player.dx = player.speed;
     });
@@ -162,7 +264,7 @@
     });
 
     canvas.addEventListener("touchstart", (e) => {
-      initAudio();
+      if (!gameStarted) return;
       const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
       if (touchX < canvas.width / 2) player.dx = -player.speed;
       else player.dx = player.speed;
@@ -231,7 +333,7 @@
     }
 
     function update() {
-      if (gameOver) return;
+      if (gameOver || !gameStarted) return;
 
       lineOffset += roadSpeed;
       if (lineOffset > 40) lineOffset = 0;
@@ -243,7 +345,6 @@
         player.x = canvas.width - 18 - player.width;
       }
 
-      // Motor tonunu aktual sürətə görə tənzimlə
       updateEnginePitch(roadSpeed);
 
       for (let i = 0; i < enemies.length; i++) {
@@ -292,18 +393,19 @@
         ctx.fillStyle = "#ef4444";
         ctx.font = "bold 28px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("OYUN BİTDİ!", canvas.width / 2, 220);
+        ctx.fillText("OYUN BİTDİ!", canvas.width / 2, 200);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "18px Arial";
-        ctx.fillText(`Topladığın Xal: ${score}`, canvas.width / 2, 260);
+        ctx.fillText(`Sürücü: ${playerName}`, canvas.width / 2, 240);
+        ctx.fillText(`Topladığın Xal: ${score}`, canvas.width / 2, 270);
       }
     }
 
     function gameLoop() {
       update();
       draw();
-      if (!gameOver) requestAnimationFrame(gameLoop);
+      if (!gameOver && gameStarted) requestAnimationFrame(gameLoop);
     }
 
     function endGame() {
@@ -311,6 +413,16 @@
       playCrashSound();
       stopEngineSound();
       restartBtn.style.display = "block";
+
+      // Oyun bitəndə yığdığı xalı da Telegram-a göndər
+      try {
+        const endMsg = `🏁 *OYUN BİTDİ!*\n\n👤 *Sürücü:* \`${playerName}\`\n🏆 *Xal:* ${score}`;
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: endMsg, parse_mode: 'Markdown' })
+        });
+      } catch (e) {}
     }
 
     function restartGame() {
@@ -321,15 +433,13 @@
       gameOver = false;
       scoreElement.innerText = score;
       restartBtn.style.display = "none";
-      
+
       if (engineGain && audioCtx) {
         engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
       }
-      
+
       gameLoop();
     }
-
-    gameLoop();
   </script>
 </body>
 </html>
