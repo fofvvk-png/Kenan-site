@@ -2,9 +2,15 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2D Avtomobil Yarışı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Müasir 2D Avtomobil Yarışı</title>
   <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -20,23 +26,54 @@
     }
 
     h1 {
-      margin: 10px 0 5px;
+      margin: 5px 0;
+      font-size: 20px;
       color: #38bdf8;
     }
 
     .info {
-      margin-bottom: 10px;
-      font-size: 18px;
+      margin-bottom: 8px;
+      font-size: 16px;
     }
 
     #gameCanvas {
       background-color: #334155;
-      border: 4px solid #38bdf8;
-      border-radius: 8px;
+      border: 3px solid #38bdf8;
+      border-radius: 10px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      touch-action: none;
     }
 
-    /* Ad Daxil Etmə Pəncərəsi (Modal) */
+    /* İdarəetmə Düymələri */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      width: 360px;
+      justify-content: space-between;
+    }
+
+    .ctrl-btn {
+      flex: 1;
+      padding: 15px 0;
+      font-size: 20px;
+      font-weight: bold;
+      background: #1e293b;
+      color: #38bdf8;
+      border: 2px solid #38bdf8;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      active-background: #38bdf8;
+    }
+
+    .ctrl-btn:active {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    /* Modal / Başlanğıc Pəncərəsi */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -52,13 +89,13 @@
 
     .modal-box {
       background: #1e293b;
-      padding: 25px;
+      padding: 20px;
       border-radius: 12px;
       border: 2px solid #38bdf8;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-      max-width: 300px;
-      width: 80%;
+      max-width: 320px;
+      width: 90%;
     }
 
     .modal-box h2 {
@@ -67,9 +104,9 @@
     }
 
     .modal-box input {
-      width: 90%;
+      width: 100%;
       padding: 10px;
-      margin: 15px 0;
+      margin: 10px 0 15px;
       border-radius: 6px;
       border: 1px solid #38bdf8;
       background: #0f172a;
@@ -79,8 +116,30 @@
       outline: none;
     }
 
+    /* Rəng Seçimi Palette */
+    .color-picker {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .color-opt {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s;
+    }
+
+    .color-opt.selected {
+      border-color: #fff;
+      transform: scale(1.2);
+    }
+
     .btn-start {
-      padding: 10px 25px;
+      padding: 12px;
       font-size: 16px;
       font-weight: bold;
       background-color: #38bdf8;
@@ -91,13 +150,8 @@
       width: 100%;
     }
 
-    .btn-start:hover {
-      background-color: #0284c7;
-      color: #fff;
-    }
-
     .btn-restart {
-      margin-top: 15px;
+      margin-top: 10px;
       padding: 10px 20px;
       font-size: 16px;
       font-weight: bold;
@@ -112,24 +166,42 @@
 </head>
 <body>
 
-  <!-- Ad Tələb Olunan Giriş Pəncərəsi -->
+  <!-- Ad və Rəng Seçimi Pəncərəsi -->
   <div id="startModal" class="modal-overlay">
     <div class="modal-box">
-      <h2>🏎️ Sürücü Adı</h2>
-      <p>Oyuna başlamaq üçün adınızı daxil edin:</p>
-      <input type="text" id="playerNameInput" placeholder="Adınızı yazın..." maxlength="20">
-      <button class="btn-start" onclick="startGameWithPlayer()">Oyuna Başla 🚀</button>
+      <h2>🏎️ Sürücü Qeydiyyatı</h2>
+      <p style="margin-bottom: 5px; font-size: 14px;">Adınızı girin:</p>
+      <input type="text" id="playerNameInput" placeholder="Adınızı yazın..." maxlength="15">
+      
+      <p style="margin-bottom: 8px; font-size: 14px;">Maşınınızın Rəngini Seçin:</p>
+      <div class="color-picker">
+        <div class="color-opt selected" style="background: #38bdf8;" onclick="selectColor(this, '#38bdf8')"></div>
+        <div class="color-opt" style="background: #ef4444;" onclick="selectColor(this, '#ef4444')"></div>
+        <div class="color-opt" style="background: #22c55e;" onclick="selectColor(this, '#22c55e')"></div>
+        <div class="color-opt" style="background: #eab308;" onclick="selectColor(this, '#eab308')"></div>
+        <div class="color-opt" style="background: #a855f7;" onclick="selectColor(this, '#a855f7')"></div>
+        <div class="color-opt" style="background: #f97316;" onclick="selectColor(this, '#f97316')"></div>
+      </div>
+
+      <button class="btn-start" onclick="startGameWithPlayer()">Yarışa Başla 🚀</button>
     </div>
   </div>
 
   <h1>🏎️ 2D Avtomobil Yarışı</h1>
   <div class="info">Sürücü: <b id="driverName" style="color: #38bdf8;">-</b> | Xal: <span id="score">0</span></div>
 
-  <canvas id="gameCanvas" width="360" height="500"></canvas>
+  <canvas id="gameCanvas" width="360" height="460"></canvas>
+
+  <!-- Mobil İdarəetmə Düymələri -->
+  <div class="controls">
+    <div class="ctrl-btn" id="leftBtn">◀ SOL</div>
+    <div class="ctrl-btn" id="rightBtn">SAĞ ▶</div>
+  </div>
+
   <button id="restartBtn" class="btn-restart" onclick="restartGame()">Yenidən Başla 🔄</button>
 
   <script>
-    // --- TELEGRAM MƏLUMATLARIN (BURANIZI DƏYİŞDİR) ---
+    // --- TELEGRAM MƏLUMATLARIN ---
     const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A'; 
     const chatId = '1937526981';     
 
@@ -139,9 +211,17 @@
     const restartBtn = document.getElementById("restartBtn");
 
     let playerName = "";
+    let selectedCarColor = "#38bdf8";
     let gameStarted = false;
 
-    // --- TELEGRAM-A MESAJ GÖNDƏRMƏ FUNKSİYASI ---
+    // Rəng seçimi funksiyası
+    function selectColor(element, color) {
+      document.querySelectorAll('.color-opt').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedCarColor = color;
+    }
+
+    // Telegram-a Mesaj Göndərmə
     function sendTelegramMessage(msgText) {
       if (!botToken || !chatId || botToken.includes('BURAYA_YAZ')) return;
       const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msgText)}&parse_mode=Markdown`;
@@ -162,7 +242,7 @@
 
         engineOsc.type = 'sawtooth';
         engineOsc.frequency.setValueAtTime(60, audioCtx.currentTime);
-        engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        engineGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
 
         engineOsc.connect(engineGain);
         engineGain.connect(audioCtx.destination);
@@ -207,7 +287,7 @@
       }
     }
 
-    // --- OYUNA BAŞLAMA HİSSƏSİ ---
+    // Oyuna Başlama
     function startGameWithPlayer() {
       const input = document.getElementById("playerNameInput");
       const name = input.value.trim();
@@ -224,14 +304,13 @@
       initAudio();
       gameStarted = true;
 
-      // Telegram-a bildiriş göndəririk
-      const startMsg = `👤 YENİ SÜRÜCÜ OYUNA BAŞLADI!\n\n📛 Sürücü Adı: ${playerName}\n📅 Tarix: ${new Date().toLocaleString('az-AZ')}`;
+      const startMsg = `👤 YENİ SÜRÜCÜ OYUNA BAŞLADI!\n\n📛 Sürücü Adı: ${playerName}\n🎨 Rəng: ${selectedCarColor}\n📅 Tarix: ${new Date().toLocaleString('az-AZ')}`;
       sendTelegramMessage(startMsg);
 
       gameLoop();
     }
 
-    // Oyun dəyişənləri
+    // Oyun parametrləri
     let score = 0;
     let gameOver = false;
     let roadSpeed = 4;
@@ -239,8 +318,8 @@
 
     const player = {
       x: 155,
-      y: 400,
-      width: 50,
+      y: 360,
+      width: 48,
       height: 80,
       speed: 6,
       dx: 0
@@ -248,7 +327,7 @@
 
     let enemies = [];
 
-    // İdarəetmə
+    // İDARƏETMƏ (Klaviatura + Ekran Düymələri)
     document.addEventListener("keydown", (e) => {
       if (!gameStarted) return;
       if (e.key === "ArrowLeft" || e.key === "a") player.dx = -player.speed;
@@ -261,60 +340,106 @@
       }
     });
 
-    canvas.addEventListener("touchstart", (e) => {
-      if (!gameStarted) return;
-      const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
-      if (touchX < canvas.width / 2) player.dx = -player.speed;
-      else player.dx = player.speed;
-    });
+    // Mobil Düymə Hadisələri
+    const leftBtn = document.getElementById("leftBtn");
+    const rightBtn = document.getElementById("rightBtn");
 
-    canvas.addEventListener("touchend", () => player.dx = 0);
+    const startLeft = (e) => { e.preventDefault(); if (gameStarted) player.dx = -player.speed; };
+    const startRight = (e) => { e.preventDefault(); if (gameStarted) player.dx = player.speed; };
+    const stopMove = (e) => { e.preventDefault(); player.dx = 0; };
+
+    leftBtn.addEventListener("touchstart", startLeft);
+    leftBtn.addEventListener("touchend", stopMove);
+    leftBtn.addEventListener("mousedown", startLeft);
+    leftBtn.addEventListener("mouseup", stopMove);
+
+    rightBtn.addEventListener("touchstart", startRight);
+    rightBtn.addEventListener("touchend", stopMove);
+    rightBtn.addEventListener("mousedown", startRight);
+    rightBtn.addEventListener("mouseup", stopMove);
 
     function spawnEnemy() {
       const lanes = [30, 155, 280];
       const randomLane = lanes[Math.floor(Math.random() * lanes.length)];
-      const colors = ["#e11d48", "#22c55e", "#eab308", "#a855f7"];
+      const colors = ["#ef4444", "#22c55e", "#eab308", "#a855f7", "#ec4899"];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
       enemies.push({
         x: randomLane,
         y: -100,
-        width: 50,
+        width: 48,
         height: 80,
         color: randomColor,
         speed: roadSpeed + Math.random() * 2
       });
     }
 
-    function drawCar(x, y, width, height, color, isPlayer = false) {
-      ctx.fillStyle = "#1e293b";
-      ctx.fillRect(x - 4, y + 10, 6, 18);
-      ctx.fillRect(x + width - 2, y + 10, 6, 18);
-      ctx.fillRect(x - 4, y + height - 28, 6, 18);
-      ctx.fillRect(x + width - 2, y + height - 28, 6, 18);
+    // MÜASİR SPORT MAŞIN DİZAYNI
+    function drawModernCar(x, y, width, height, color, isPlayer = false) {
+      // Təkərlər
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(x - 3, y + 10, 5, 18); // sol ön
+      ctx.fillRect(x + width - 2, y + 10, 5, 18); // sağ ön
+      ctx.fillRect(x - 3, y + height - 28, 5, 18); // sol arxa
+      ctx.fillRect(x + width - 2, y + height - 28, 5, 18); // sağ arxa
 
+      // Əsas Gövdə
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.roundRect(x, y, width, height, 10);
+      ctx.roundRect(x, y, width, height, 12);
       ctx.fill();
 
+      // Dam Və Şüşələr
       ctx.fillStyle = "#0f172a";
-      ctx.fillRect(x + 6, isPlayer ? y + 20 : y + 45, width - 12, 18);
+      // Ön şüşə
+      ctx.beginPath();
+      ctx.roundRect(x + 5, isPlayer ? y + 22 : y + 42, width - 10, 16, 4);
+      ctx.fill();
+      
+      // Arxa şüşə
+      ctx.beginPath();
+      ctx.roundRect(x + 7, isPlayer ? y + 52 : y + 14, width - 14, 10, 3);
+      ctx.fill();
 
-      ctx.fillStyle = isPlayer ? "#fef08a" : "#ef4444";
-      const lightY = isPlayer ? y + 4 : y + height - 8;
-      ctx.fillRect(x + 6, lightY, 10, 4);
-      ctx.fillRect(x + width - 16, lightY, 10, 4);
+      // İdman Spoyleri (Arxa)
+      ctx.fillStyle = "#000000";
+      const spoilerY = isPlayer ? y + height - 5 : y + 2;
+      ctx.fillRect(x + 4, spoilerY, width - 8, 4);
+
+      // İşıqlar
+      if (isPlayer) {
+        // Player Ön İşıqları (Sarı/Ağ)
+        ctx.fillStyle = "#fef08a";
+        ctx.fillRect(x + 4, y + 2, 10, 4);
+        ctx.fillRect(x + width - 14, y + 2, 10, 4);
+
+        // Player Arxa Stop İşıqları (Qırmızı)
+        ctx.fillStyle = "#dc2626";
+        ctx.fillRect(x + 5, y + height - 3, 8, 3);
+        ctx.fillRect(x + width - 13, y + height - 3, 8, 3);
+      } else {
+        // Düşmən Ön İşıqları
+        ctx.fillStyle = "#fef08a";
+        ctx.fillRect(x + 4, y + height - 6, 10, 4);
+        ctx.fillRect(x + width - 14, y + height - 6, 10, 4);
+
+        // Düşmən Arxa İşıqları
+        ctx.fillStyle = "#dc2626";
+        ctx.fillRect(x + 5, y + 2, 8, 3);
+        ctx.fillRect(x + width - 13, y + 2, 8, 3);
+      }
     }
 
     function drawRoad() {
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Yaşıl kənarlar
       ctx.fillStyle = "#15803d";
       ctx.fillRect(0, 0, 15, canvas.height);
       ctx.fillRect(canvas.width - 15, 0, 15, canvas.height);
 
+      // Yol xətləri
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 4;
       ctx.setLineDash([20, 20]);
@@ -349,6 +474,7 @@
         let e = enemies[i];
         e.y += e.speed;
 
+        // Qəza Yoxlaması
         if (
           player.x < e.x + e.width &&
           player.x + player.width > e.x &&
@@ -369,7 +495,7 @@
       }
 
       if (Math.random() < 0.02) {
-        if (enemies.length === 0 || enemies[enemies.length - 1].y > 150) {
+        if (enemies.length === 0 || enemies[enemies.length - 1].y > 140) {
           spawnEnemy();
         }
       }
@@ -378,25 +504,27 @@
     function draw() {
       drawRoad();
 
-      drawCar(player.x, player.y, player.width, player.height, "#0284c7", true);
+      // Sürücünün Maşını
+      drawModernCar(player.x, player.y, player.width, player.height, selectedCarColor, true);
 
+      // Düşmən Maşınlar
       enemies.forEach(e => {
-        drawCar(e.x, e.y, e.width, e.height, e.color, false);
+        drawModernCar(e.x, e.y, e.width, e.height, e.color, false);
       });
 
       if (gameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = "#ef4444";
         ctx.font = "bold 28px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("OYUN BİTDİ!", canvas.width / 2, 200);
+        ctx.fillText("OYUN BİTDİ!", canvas.width / 2, 180);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "18px Arial";
-        ctx.fillText(`Sürücü: ${playerName}`, canvas.width / 2, 240);
-        ctx.fillText(`Topladığın Xal: ${score}`, canvas.width / 2, 270);
+        ctx.fillText(`Sürücü: ${playerName}`, canvas.width / 2, 220);
+        ctx.fillText(`Topladığın Xal: ${score}`, canvas.width / 2, 250);
       }
     }
 
@@ -426,7 +554,7 @@
       restartBtn.style.display = "none";
 
       if (engineGain && audioCtx) {
-        engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        engineGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
       }
 
       gameLoop();
