@@ -68,15 +68,75 @@
     const scoreElement = document.getElementById("score");
     const restartBtn = document.getElementById("restartBtn");
 
+    // --- SƏS SİSTEMİ (Web Audio API) ---
+    let audioCtx = null;
+    let engineOsc = null;
+    let engineGain = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Mühərrik genratoru
+        engineOsc = audioCtx.createOscillator();
+        engineGain = audioCtx.createGain();
+
+        engineOsc.type = 'sawtooth'; // Motor xırıldaması üçün
+        engineOsc.frequency.setValueAtTime(60, audioCtx.currentTime); // Başlanğıc RPM
+        engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime); // Səs səviyyəsi
+
+        engineOsc.connect(engineGain);
+        engineGain.connect(audioCtx.destination);
+        engineOsc.start();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playCrashSound() {
+      if (!audioCtx) return;
+      
+      // Toqquşma səsi üçün ağ küy (white noise)
+      const bufferSize = audioCtx.sampleRate * 0.5;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+      noise.connect(gain);
+      gain.connect(audioCtx.destination);
+      noise.start();
+    }
+
+    function stopEngineSound() {
+      if (engineGain) {
+        engineGain.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
+    }
+
+    function updateEnginePitch(speed) {
+      if (engineOsc && audioCtx) {
+        // Maşın sürətləndikcə motorun səsi (tonu) yüksəlir
+        const freq = 50 + (speed * 12);
+        engineOsc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      }
+    }
+
     // Oyun dəyişənləri
     let score = 0;
     let gameOver = false;
     let roadSpeed = 4;
-
-    // Şerit xətlərinin hərəkəti
     let lineOffset = 0;
 
-    // İstifadəçinin maşını (Chevrolet Cruze)
     const player = {
       x: 155,
       y: 400,
@@ -86,11 +146,11 @@
       dx: 0
     };
 
-    // Yolda olan maneə maşınlar
     let enemies = [];
 
-    // İdarəetmə düymələri
+    // İdarəetmə
     document.addEventListener("keydown", (e) => {
+      initAudio();
       if (e.key === "ArrowLeft" || e.key === "a") player.dx = -player.speed;
       if (e.key === "ArrowRight" || e.key === "d") player.dx = player.speed;
     });
@@ -101,8 +161,8 @@
       }
     });
 
-    // Mobil toxunuş dəstəyi (Ekrana toxunaraq idarə etmək üçün)
     canvas.addEventListener("touchstart", (e) => {
+      initAudio();
       const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
       if (touchX < canvas.width / 2) player.dx = -player.speed;
       else player.dx = player.speed;
@@ -110,9 +170,8 @@
 
     canvas.addEventListener("touchend", () => player.dx = 0);
 
-    // Yeni maneə maşın yaratmaq
     function spawnEnemy() {
-      const lanes = [30, 155, 280]; // 3 zolaq
+      const lanes = [30, 155, 280];
       const randomLane = lanes[Math.floor(Math.random() * lanes.length)];
       const colors = ["#e11d48", "#22c55e", "#eab308", "#a855f7"];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -127,44 +186,35 @@
       });
     }
 
-    // Maşın rəsmini çəkmək (Kuzov, şüşə, təkərlər)
     function drawCar(x, y, width, height, color, isPlayer = false) {
-      // Təkərlər
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(x - 4, y + 10, 6, 18);
       ctx.fillRect(x + width - 2, y + 10, 6, 18);
       ctx.fillRect(x - 4, y + height - 28, 6, 18);
       ctx.fillRect(x + width - 2, y + height - 28, 6, 18);
 
-      // Kuzov
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.roundRect(x, y, width, height, 10);
       ctx.fill();
 
-      // Şüşə
       ctx.fillStyle = "#0f172a";
       ctx.fillRect(x + 6, isPlayer ? y + 20 : y + 45, width - 12, 18);
 
-      // Faralar
       ctx.fillStyle = isPlayer ? "#fef08a" : "#ef4444";
       const lightY = isPlayer ? y + 4 : y + height - 8;
       ctx.fillRect(x + 6, lightY, 10, 4);
       ctx.fillRect(x + width - 16, lightY, 10, 4);
     }
 
-    // Yolu çəkmək
     function drawRoad() {
-      // Asfalt
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Kənar yaşıl zonalar
       ctx.fillStyle = "#15803d";
       ctx.fillRect(0, 0, 15, canvas.height);
       ctx.fillRect(canvas.width - 15, 0, 15, canvas.height);
 
-      // Ortadakı kəsik şerit xətləri
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 4;
       ctx.setLineDash([20, 20]);
@@ -177,32 +227,29 @@
       ctx.lineTo(240, canvas.height);
       ctx.stroke();
 
-      ctx.setLineDash([]); // Sıfırla
+      ctx.setLineDash([]);
     }
 
-    // Yenilənmə dövrü
     function update() {
       if (gameOver) return;
 
-      // Yolu hərəkət etdir
       lineOffset += roadSpeed;
       if (lineOffset > 40) lineOffset = 0;
 
-      // Oyunçunu hərəkət etdir
       player.x += player.dx;
 
-      // Yoldan kənara çıxmağın qarşısını al
       if (player.x < 18) player.x = 18;
       if (player.x + player.width > canvas.width - 18) {
         player.x = canvas.width - 18 - player.width;
       }
 
-      // Maneələri hərəkət etdir
+      // Motor tonunu aktual sürətə görə tənzimlə
+      updateEnginePitch(roadSpeed);
+
       for (let i = 0; i < enemies.length; i++) {
         let e = enemies[i];
         e.y += e.speed;
 
-        // Toqquşma yoxlaması (Collision Detection)
         if (
           player.x < e.x + e.width &&
           player.x + player.width > e.x &&
@@ -212,19 +259,16 @@
           endGame();
         }
 
-        // Ekrandan çıxan maşınları sil və xal yaz
         if (e.y > canvas.height) {
           enemies.splice(i, 1);
           score += 10;
           scoreElement.innerText = score;
           i--;
 
-          // Sürəti tədricən artır
           if (score % 50 === 0) roadSpeed += 0.5;
         }
       }
 
-      // Müəyyən intervalla yeni maşın əlavə et
       if (Math.random() < 0.02) {
         if (enemies.length === 0 || enemies[enemies.length - 1].y > 150) {
           spawnEnemy();
@@ -232,14 +276,11 @@
       }
     }
 
-    // Ekrana çəkmə dövrü
     function draw() {
       drawRoad();
 
-      // Oyunçunu çək (Mavi Cruze)
       drawCar(player.x, player.y, player.width, player.height, "#0284c7", true);
 
-      // Maneələri çək
       enemies.forEach(e => {
         drawCar(e.x, e.y, e.width, e.height, e.color, false);
       });
@@ -267,6 +308,8 @@
 
     function endGame() {
       gameOver = true;
+      playCrashSound();
+      stopEngineSound();
       restartBtn.style.display = "block";
     }
 
@@ -278,10 +321,14 @@
       gameOver = false;
       scoreElement.innerText = score;
       restartBtn.style.display = "none";
+      
+      if (engineGain && audioCtx) {
+        engineGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      }
+      
       gameLoop();
     }
 
-    // Oyunu başlat
     gameLoop();
   </script>
 </body>
