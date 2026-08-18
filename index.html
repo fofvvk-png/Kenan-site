@@ -3,104 +3,286 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoAssistant - Şəxsi Avtomobil Paneli</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <title>2D Avtomobil Yarışı</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 10px 0 5px;
+      color: #38bdf8;
+    }
+
+    .info {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    #gameCanvas {
+      background-color: #334155;
+      border: 4px solid #38bdf8;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-restart {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #38bdf8;
+      color: #0f172a;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .btn-restart:hover {
+      background-color: #0284c7;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- ANA SƏHİFƏ -->
-    <div id="homePage" class="page active">
-      <div class="header">
-        <h1>🚗 AutoAssistant</h1>
-        <p>Şəxsi Avtomobil və Texniki Qulluq Paneli</p>
-      </div>
+  <h1>🏎️ 2D Avtomobil Yarışı</h1>
+  <div class="info">Xal: <span id="score">0</span></div>
 
-      <div class="menu-grid">
-        <div class="card" onclick="showPage('garagePage')">
-          <div class="card-icon">🚘</div>
-          <h2>3D Avtomobil Qarajı</h2>
-          <p>İstədiyiniz markanı, modeli və ili daxil edərək maşını 3D görünüşdə yaradın və inceleyin.</p>
-        </div>
+  <canvas id="gameCanvas" width="360" height="500"></canvas>
+  <button id="restartBtn" class="btn-restart" onclick="restartGame()">Yenidən Başla 🔄</button>
 
-        <div class="card" onclick="showPage('fuelPage')">
-          <div class="card-icon">⛽</div>
-          <h2>Yanacaq & Texniki Qulluq</h2>
-          <p>100 km sərfiyyatı, xərcləri və növbəti yağ dəyişmə vaxtını hesablayıb Telegram-a göndərin.</p>
-        </div>
-      </div>
-    </div>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreElement = document.getElementById("score");
+    const restartBtn = document.getElementById("restartBtn");
 
-    <!-- 1. QARAJ SƏHİFƏSİ -->
-    <div id="garagePage" class="page">
-      <button class="back-btn" onclick="showPage('homePage')">⬅ Geri Qayıt</button>
-      
-      <h2>🚘 3D Avtomobil Qarajı</h2>
-      <p class="sub-text">Yaratmaq istədiyiniz avtomobilin məlumatlarını daxil edin:</p>
+    // Oyun dəyişənləri
+    let score = 0;
+    let gameOver = false;
+    let roadSpeed = 4;
 
-      <div class="form-group">
-        <label>Avtomobil Marka/Modeli:</label>
-        <input type="text" id="customModel" placeholder="Məsələn: Chevrolet Cruze, Kia Optima...">
-      </div>
+    // Şerit xətlərinin hərəkəti
+    let lineOffset = 0;
 
-      <div class="form-group">
-        <label>Buraxılış İli:</label>
-        <input type="number" id="customYear" placeholder="Məsələn: 2015">
-      </div>
+    // İstifadəçinin maşını (Chevrolet Cruze)
+    const player = {
+      x: 155,
+      y: 400,
+      width: 50,
+      height: 80,
+      speed: 6,
+      dx: 0
+    };
 
-      <button class="btn-primary" onclick="searchAndGenerate3D()">✨ 3D Avtomobili Yarat</button>
+    // Yolda olan maneə maşınlar
+    let enemies = [];
 
-      <div id="garageDisplay" class="garage-display" style="display: none;">
-        <h3 id="carTitle">Avtomobil</h3>
-        <div id="threeContainer" class="iframe-container"></div>
-      </div>
-    </div>
+    // İdarəetmə düymələri
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "a") player.dx = -player.speed;
+      if (e.key === "ArrowRight" || e.key === "d") player.dx = player.speed;
+    });
 
-    <!-- 2. YANACAQ VƏ TEXNİKİ HESABLAYICI SƏHİFƏSİ -->
-    <div id="fuelPage" class="page">
-      <button class="back-btn" onclick="showPage('homePage')">⬅ Geri Qayıt</button>
+    document.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "ArrowRight" || e.key === "d") {
+        player.dx = 0;
+      }
+    });
 
-      <h2>⛽ Yanacaq və Qulluq Hesablayıcı</h2>
-      <p class="sub-text">Sərfiyyatı və xərcləri hesablayın:</p>
+    // Mobil toxunuş dəstəyi (Ekrana toxunaraq idarə etmək üçün)
+    canvas.addEventListener("touchstart", (e) => {
+      const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+      if (touchX < canvas.width / 2) player.dx = -player.speed;
+      else player.dx = player.speed;
+    });
 
-      <div class="form-group">
-        <label>Avtomobilin Adı:</label>
-        <input type="text" id="calcModelName" placeholder="Məsələn: Chevrolet Cruze">
-      </div>
+    canvas.addEventListener("touchend", () => player.dx = 0);
 
-      <div class="form-group">
-        <label>Qət olunan məsafə (km):</label>
-        <input type="number" id="distance" placeholder="Məsələn: 450">
-      </div>
+    // Yeni maneə maşın yaratmaq
+    function spawnEnemy() {
+      const lanes = [30, 155, 280]; // 3 zolaq
+      const randomLane = lanes[Math.floor(Math.random() * lanes.length)];
+      const colors = ["#e11d48", "#22c55e", "#eab308", "#a855f7"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
-      <div class="form-group">
-        <label>Xərclənən yanacaq (Litr):</label>
-        <input type="number" id="fuel" placeholder="Məsələn: 38">
-      </div>
+      enemies.push({
+        x: randomLane,
+        y: -100,
+        width: 50,
+        height: 80,
+        color: randomColor,
+        speed: roadSpeed + Math.random() * 2
+      });
+    }
 
-      <div class="form-group">
-        <label>1 Litr Yanacağın Qiyməti (AZN):</label>
-        <input type="number" step="0.01" id="price" placeholder="Məsələn: 1.00">
-      </div>
+    // Maşın rəsmini çəkmək (Kuzov, şüşə, təkərlər)
+    function drawCar(x, y, width, height, color, isPlayer = false) {
+      // Təkərlər
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(x - 4, y + 10, 6, 18);
+      ctx.fillRect(x + width - 2, y + 10, 6, 18);
+      ctx.fillRect(x - 4, y + height - 28, 6, 18);
+      ctx.fillRect(x + width - 2, y + height - 28, 6, 18);
 
-      <div class="form-group">
-        <label>Cari Probeq (km):</label>
-        <input type="number" id="mileage" placeholder="Məsələn: 185000">
-      </div>
+      // Kuzov
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(x, y, width, height, 10);
+      ctx.fill();
 
-      <button class="btn-primary" onclick="calculateFuel()">🧮 Hesabla</button>
+      // Şüşə
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(x + 6, isPlayer ? y + 20 : y + 45, width - 12, 18);
 
-      <div id="calcResult" class="result-box" style="display: none;">
-        <h3>📊 Hesabat Nəticəsi</h3>
-        <p id="resFuel"></p>
-        <p id="resCost"></p>
-        <p id="resOil"></p>
-        <button class="btn-telegram" onclick="sendToTelegram()">📲 Hesabatı Telegram-a Göndər</button>
-      </div>
-    </div>
-  </div>
+      // Faralar
+      ctx.fillStyle = isPlayer ? "#fef08a" : "#ef4444";
+      const lightY = isPlayer ? y + 4 : y + height - 8;
+      ctx.fillRect(x + 6, lightY, 10, 4);
+      ctx.fillRect(x + width - 16, lightY, 10, 4);
+    }
 
-  <script src="script.js"></script>
+    // Yolu çəkmək
+    function drawRoad() {
+      // Asfalt
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Kənar yaşıl zonalar
+      ctx.fillStyle = "#15803d";
+      ctx.fillRect(0, 0, 15, canvas.height);
+      ctx.fillRect(canvas.width - 15, 0, 15, canvas.height);
+
+      // Ortadakı kəsik şerit xətləri
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([20, 20]);
+      ctx.lineDashOffset = -lineOffset;
+
+      ctx.beginPath();
+      ctx.moveTo(120, 0);
+      ctx.lineTo(120, canvas.height);
+      ctx.moveTo(240, 0);
+      ctx.lineTo(240, canvas.height);
+      ctx.stroke();
+
+      ctx.setLineDash([]); // Sıfırla
+    }
+
+    // Yenilənmə dövrü
+    function update() {
+      if (gameOver) return;
+
+      // Yolu hərəkət etdir
+      lineOffset += roadSpeed;
+      if (lineOffset > 40) lineOffset = 0;
+
+      // Oyunçunu hərəkət etdir
+      player.x += player.dx;
+
+      // Yoldan kənara çıxmağın qarşısını al
+      if (player.x < 18) player.x = 18;
+      if (player.x + player.width > canvas.width - 18) {
+        player.x = canvas.width - 18 - player.width;
+      }
+
+      // Maneələri hərəkət etdir
+      for (let i = 0; i < enemies.length; i++) {
+        let e = enemies[i];
+        e.y += e.speed;
+
+        // Toqquşma yoxlaması (Collision Detection)
+        if (
+          player.x < e.x + e.width &&
+          player.x + player.width > e.x &&
+          player.y < e.y + e.height &&
+          player.y + player.height > e.y
+        ) {
+          endGame();
+        }
+
+        // Ekrandan çıxan maşınları sil və xal yaz
+        if (e.y > canvas.height) {
+          enemies.splice(i, 1);
+          score += 10;
+          scoreElement.innerText = score;
+          i--;
+
+          // Sürəti tədricən artır
+          if (score % 50 === 0) roadSpeed += 0.5;
+        }
+      }
+
+      // Müəyyən intervalla yeni maşın əlavə et
+      if (Math.random() < 0.02) {
+        if (enemies.length === 0 || enemies[enemies.length - 1].y > 150) {
+          spawnEnemy();
+        }
+      }
+    }
+
+    // Ekrana çəkmə dövrü
+    function draw() {
+      drawRoad();
+
+      // Oyunçunu çək (Mavi Cruze)
+      drawCar(player.x, player.y, player.width, player.height, "#0284c7", true);
+
+      // Maneələri çək
+      enemies.forEach(e => {
+        drawCar(e.x, e.y, e.width, e.height, e.color, false);
+      });
+
+      if (gameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#ef4444";
+        ctx.font = "bold 28px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("OYUN BİTDİ!", canvas.width / 2, 220);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "18px Arial";
+        ctx.fillText(`Topladığın Xal: ${score}`, canvas.width / 2, 260);
+      }
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      if (!gameOver) requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      gameOver = true;
+      restartBtn.style.display = "block";
+    }
+
+    function restartGame() {
+      score = 0;
+      roadSpeed = 4;
+      enemies = [];
+      player.x = 155;
+      gameOver = false;
+      scoreElement.innerText = score;
+      restartBtn.style.display = "none";
+      gameLoop();
+    }
+
+    // Oyunu başlat
+    gameLoop();
+  </script>
 </body>
 </html>
