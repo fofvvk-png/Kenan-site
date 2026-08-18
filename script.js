@@ -221,3 +221,13 @@ function gameLoop() {
 function restartGame() {
   location.reload();
 }
+function openFullscreen() {
+  let elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari / Chrome mobile */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
