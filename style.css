@@ -1,43 +1,31 @@
-/* Ekranı Üfüqi Rejimə Uyğunlaşdırırıq */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 body {
-  flex-direction: row !important; /* Düymələr və canvas böyür-böyürə yerləşir */
-  justify-content: space-evenly !important;
-  padding: 10px;
-}
-
-/* Canvas ölçüsünü üfüqi mühitə uyğun genişləndiririk */
-#gameCanvas {
-  width: 500px !important;
-  height: 320px !important;
-}
-
-/* İdarəetmə düymələrini Canvas-ın soluna və sağına keçiririk */
-.controls {
-  position: absolute;
-  bottom: 20px;
-  width: 95%;
+  background-color: #0f172a;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
-  justify-content: space-between;
-  pointer-events: none; /* Kliklərin canvas-a mane olmaması üçün */
-}
-
-.ctrl-btn {
-  pointer-events: auto;
-  width: 90px;
-  height: 90px;
-  border-radius: 50% !important; /* Dairəvi joystik stili düymələr */
-  display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  background: rgba(30, 41, 59, 0.8);
+  justify-content: space-evenly;
+  min-height: 100vh;
+  padding: 10px;
+  overflow: hidden;
 }
 
-/* Telefon Şaquli (Dik) Tutulduqda Xəbərdarlıq Pəncərəsi */
 #rotateWarning {
   display: none;
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: #0f172a;
   color: #38bdf8;
   z-index: 999;
@@ -50,6 +38,153 @@ body {
 
 @media screen and (orientation: portrait) {
   #rotateWarning {
-    display: flex; /* Telefon dik duranda xəbərdarlığı göstər */
+    display: flex;
   }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-box {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  text-align: center;
+  width: 320px;
+  border: 1px solid #334155;
+}
+
+.modal-box h2 {
+  margin-bottom: 12px;
+  color: #38bdf8;
+  font-size: 20px;
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #475569;
+  background: #0f172a;
+  color: #fff;
+  text-align: center;
+  font-size: 15px;
+  outline: none;
+}
+
+.color-picker {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.color-opt {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s;
+}
+
+.color-opt.selected {
+  border-color: #fff;
+  transform: scale(1.15);
+}
+
+.btn-start {
+  width: 100%;
+  padding: 10px;
+  background: #22c55e;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#statusText {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #eab308;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: 18px;
+  margin-bottom: 5px;
+  color: #38bdf8;
+}
+
+.info {
+  margin-bottom: 8px;
+  font-size: 13px;
+  background: #1e293b;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #334155;
+}
+
+#gameCanvas {
+  background-color: #334155;
+  border: 3px solid #475569;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  width: 500px;
+  height: 320px;
+}
+
+.controls {
+  position: absolute;
+  bottom: 15px;
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.ctrl-btn {
+  pointer-events: auto;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.85);
+  border: 2px solid #38bdf8;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-restart {
+  display: none;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #ef4444;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
