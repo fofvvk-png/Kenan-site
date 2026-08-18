@@ -129,8 +129,9 @@
   <button id="restartBtn" class="btn-restart" onclick="restartGame()">Yenidən Başla 🔄</button>
 
   <script>
-    const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A';
-    const chatId = '1937526981';
+    // --- TELEGRAM MƏLUMATLARIN (BURANIZI DƏYİŞDİR) ---
+    const botToken = '8898539577:AAEio79TVe2UPlYevcUD9yks9ju9VfUYE2A'; 
+    const chatId = '1937526981';     
 
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
@@ -139,6 +140,14 @@
 
     let playerName = "";
     let gameStarted = false;
+
+    // --- TELEGRAM-A MESAJ GÖNDƏRMƏ FUNKSİYASI ---
+    function sendTelegramMessage(msgText) {
+      if (!botToken || !chatId || botToken.includes('BURAYA_YAZ')) return;
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msgText)}&parse_mode=Markdown`;
+      const img = new Image();
+      img.src = url;
+    }
 
     // --- SƏS SİSTEMİ ---
     let audioCtx = null;
@@ -186,7 +195,7 @@
     }
 
     function stopEngineSound() {
-      if (engineGain) {
+      if (engineGain && audioCtx) {
         engineGain.gain.setValueAtTime(0, audioCtx.currentTime);
       }
     }
@@ -198,8 +207,8 @@
       }
     }
 
-    // --- OYUNA BAŞLAMA VƏ TELEGRAMA GÖNDƏRMƏ ---
-    async function startGameWithPlayer() {
+    // --- OYUNA BAŞLAMA HİSSƏSİ ---
+    function startGameWithPlayer() {
       const input = document.getElementById("playerNameInput");
       const name = input.value.trim();
 
@@ -215,20 +224,9 @@
       initAudio();
       gameStarted = true;
 
-      // Telegram-a Sürücü Məlumatını Göndər
-      try {
-        const message = `👤 *YENİ SÜRÜCÜ OYUNA BAŞLADI!*\n\n` +
-                        `📛 *Sürücü Adı:* \`${playerName}\`\n` +
-                        `📅 *Tarix:* ${new Date().toLocaleString('az-AZ')}`;
-
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
-        });
-      } catch (e) {
-        console.error("Telegram göndərişində xəta:", e);
-      }
+      // Telegram-a bildiriş göndəririk
+      const startMsg = `👤 YENİ SÜRÜCÜ OYUNA BAŞLADI!\n\n📛 Sürücü Adı: ${playerName}\n📅 Tarix: ${new Date().toLocaleString('az-AZ')}`;
+      sendTelegramMessage(startMsg);
 
       gameLoop();
     }
@@ -414,15 +412,8 @@
       stopEngineSound();
       restartBtn.style.display = "block";
 
-      // Oyun bitəndə yığdığı xalı da Telegram-a göndər
-      try {
-        const endMsg = `🏁 *OYUN BİTDİ!*\n\n👤 *Sürücü:* \`${playerName}\`\n🏆 *Xal:* ${score}`;
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, text: endMsg, parse_mode: 'Markdown' })
-        });
-      } catch (e) {}
+      const endMsg = `🏁 OYUN BİTDİ!\n\n👤 Sürücü: ${playerName}\n🏆 Xal: ${score}`;
+      sendTelegramMessage(endMsg);
     }
 
     function restartGame() {
